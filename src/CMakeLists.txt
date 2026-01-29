@@ -4,6 +4,9 @@ add_library (cs4212-util
   model_obj.cpp model_obj.h
   vec3.h
   framebuffer.h framebuffer.cpp
+  ray.h
+  camera.h
+  perspectiveCamera.h
 )
 
 add_executable(fbMain

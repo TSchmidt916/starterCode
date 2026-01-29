@@ -3,7 +3,6 @@
 #include <vector>
 
 #include "vec3.h"
-//pixel colors, clear function, export PNG
 
 class Framebuffer {
     public:
