@@ -13,7 +13,7 @@ class perspectiveCamera : public camera
 
         u = l + (r-l) * (i+0.5)/(float)nx;
         v = b + (t-b) * (j+0.5)/(float)ny;
-        vec3 dir = u*U + v*V - focal_length*W;
-        R = ray(pos, dir);
+        vec3 dir = u*U + v*V + focal_length*(-W);
+        R = ray(pos, unit_vector(dir));
     }
 };
