@@ -61,7 +61,7 @@ void Framebuffer::exportPNG(std::string filename)
         png::byte g = static_cast<png::byte>(c.y() * 255.0f);
         png::byte b = static_cast<png::byte>(c.z() * 255.0f);
 
-        imData[y][x] = png::rgb_pixel( r, g, b );
+        imData[h - 1 - y][x] = png::rgb_pixel( r, g, b );
     }
     imData.write( filename.c_str() );
 }

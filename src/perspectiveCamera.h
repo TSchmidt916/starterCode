@@ -8,6 +8,9 @@ class perspectiveCamera : public camera
     public:
     perspectiveCamera(int pixel_nx, int pixel_ny) : camera(pixel_nx, pixel_ny) {}
 
+    perspectiveCamera(int pixel_nx, int pixel_ny, const vec3& position, const vec3& direction, float focalLen, float imgPlaneWidth, float imgPlaneHeight)
+    : camera(pixel_nx, pixel_ny, position, direction, focalLen, imgPlaneWidth, imgPlaneHeight) {}
+
     void generateRay(int i, int j, ray &R) override {
         float u, v;
 

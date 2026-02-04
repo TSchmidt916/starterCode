@@ -4,10 +4,16 @@
 
 class camera {
     public:
-    camera(int pixel_nx, int pixel_ny)  : pos(10.0, 2.0, 13.0), dir(60, -8, 80), focal_length(0.8f), 
+    camera(int pixel_nx, int pixel_ny)  : pos(0, 0, 0), dir(0, 0, 0), focal_length(1.0f), 
     imageplane_width(0.5f), imageplane_height(0.5f), nx(pixel_nx), ny(pixel_ny) {
         normalizeDir();
     }
+
+    camera(int pixel_nx, int pixel_ny, const vec3& position, const vec3& direction, float focalLen, float imgPlaneWidth, float imgPlaneHeight)
+    : pos(position), dir(direction), focal_length(focalLen), imageplane_width(imgPlaneWidth), imageplane_height(imgPlaneHeight), nx(pixel_nx), ny(pixel_ny) {
+        normalizeDir();
+    }
+
     virtual ~camera() {}
 
     virtual void generateRay(int i, int j, ray &R) = 0;
@@ -22,8 +28,8 @@ class camera {
     float imageplane_height;
     float l = -imageplane_width / 2.0f;
     float r = imageplane_width / 2.0f;
-    float b = imageplane_height / 2.0f;
-    float t = -imageplane_height / 2.0f;
+    float b = -imageplane_height / 2.0f;
+    float t = imageplane_height / 2.0f;
 
     void normalizeDir() {
         W = unit_vector(-dir);

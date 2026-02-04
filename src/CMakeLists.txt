@@ -7,6 +7,8 @@ add_library (cs4212-util
   ray.h
   camera.h
   perspectiveCamera.h
+  shape.h
+  sphere.h
 )
 
 add_executable(fbMain
