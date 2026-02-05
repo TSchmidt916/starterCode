@@ -19,7 +19,8 @@ include(Catch)
 # 
 set(UTESTS 
   utest_vec3
-  utest_ray)
+  utest_ray
+  utest_shape)
 
 # 
 # For each of the executables named in ${UTESTS}, compile them into a

@@ -25,18 +25,18 @@ int main(int argc, char *argv[])
 
     fb3.exportPNG("output_camera.png");
 
-    Framebuffer fb4(200, 200);
-    perspectiveCamera cam2(200, 200, vec3(0,0,0), vec3(0,0,-1), 1.0f, 2.0f, 2.0f);
+    Framebuffer fb4(800, 800);
+    perspectiveCamera cam2(800, 800, vec3(0,0,0), vec3(0,0,-1), 1.0f, 2.0f, 2.0f);
     sphere sph(vec3(0,0,-2), 1.0f);
-    for (int j = 0; j < 200; j++) {
-        for (int i = 0; i < 200; i++) {
+    for (int j = 0; j < 800; j++) {
+        for (int i = 0; i < 800; i++) {
             ray R;
             cam2.generateRay(i, j, R);
             vec3 color;
             if (sph.intersect(R)) {
                 color = vec3((R.direction().x() + 1.0f) / 2.0f, (R.direction().y() + 1.0f) / 2.0f, (R.direction().z() + 1.0f) / 2.0f);
             } else {
-                color = vec3(0,0,0); // Black for miss
+                color = vec3(0.5 , 0.0 , 1.0f);
             }
             fb4.setPixelColor(i, j, color);
         }
