@@ -8,7 +8,8 @@ add_library (cs4212-util
   camera.h
   perspectiveCamera.h
   shape.h
-  sphere.h
+  sphere.h sphere.cpp
+  triangle.h triangle.cpp
 )
 
 add_executable(fbMain
