@@ -1,0 +1,18 @@
+#pragma once 
+#include "shader.h"
+#include "hitRecord.h"
+#include "light.h"
+
+class blinnPhong : public shader {
+public:
+    blinnPhong(const vec3& color, float ka = 0.1f, float kd = 0.7f, float ks = 0.3f, float shininess = 32.0f) 
+        : shader(color), ka(ka), kd(kd), ks(ks), shininess(shininess) {}
+    
+    vec3 ray_color(const hitRecord& rec, const light& pointLight) const override;
+
+private:
+    float ka;        
+    float kd;        
+    float ks;       
+    float shininess;
+};

@@ -2,6 +2,17 @@
 #include "perspectiveCamera.h"
 #include "sphere.h"
 #include "triangle.h"
+#include "lambertianShader.h"
+#include "BPShader.h"
+#include "normalShader.h"
+#include "light.h"
+#include "hitRecord.h"
+#include "hittableList.h"
+#include "scene.h"
+#include <memory>
+
+float tmin = 0.001f;
+float tmax = std::numeric_limits<float>::infinity();
 
 int main(int argc, char *argv[])
 {
@@ -28,15 +39,16 @@ int main(int argc, char *argv[])
 
     Framebuffer fb4(800, 800);
     perspectiveCamera cam2(800, 800, vec3(0,0,0), vec3(0,0,-1), 1.0f, 2.0f, 2.0f);
-    sphere sph(vec3(0,0,-2), 1.0f);
+    sphere sph(vec3(0,0,-2), 1.0f, nullptr);
     for (int j = 0; j < 800; j++) {
         for (int i = 0; i < 800; i++) {
             ray R;
-            float tmin = 0.001f;
-            float tmax = std::numeric_limits<float>::infinity();
             cam2.generateRay(i, j, R);
             vec3 color;
-            if (sph.intersect(R, tmin, tmax)) {
+            float tmax = std::numeric_limits<float>::infinity();
+
+            hitRecord rec1;
+            if (sph.intersect(R, tmin, tmax, rec1)) {
                 color = vec3((R.direction().x() + 1.0f) / 2.0f, (R.direction().y() + 1.0f) / 2.0f, (R.direction().z() + 1.0f) / 2.0f);
             } else {
                 color = vec3(0.5 , 0.0 , 1.0f);
@@ -48,27 +60,28 @@ int main(int argc, char *argv[])
 
     Framebuffer fb5(200, 200);
     perspectiveCamera cam3(200, 200, vec3(0,0,0), vec3(0,0,-1), 0.7f, 0.5f, 0.5f);
-    sphere sph1(vec3(0,-1.25, -7), 0.3f);
-    sphere sph2(vec3(0,0, -10), 3.0f);
-    sphere sph3(vec3(0, 0, -15), 5.0f);
+    sphere sph1(vec3(0,-1.25, -7), 0.3f, nullptr);
+    sphere sph2(vec3(0,0, -10), 3.0f, nullptr);
+    sphere sph3(vec3(0, 0, -15), 5.0f, nullptr);
     for (int j = 0; j < 200; j++) {
         for (int i = 0; i < 200; i++) {
             ray R;
-            float tmin = 0.001f;
-            float tmax = std::numeric_limits<float>::infinity();
             cam3.generateRay(i, j, R);
             vec3 yellow = vec3(0.992, 0.863, 0.239);
             vec3 blue = vec3(0.149, 0.451, 0.698);
             vec3 background = vec3(0.5, 0.5, 0.5f);
             vec3 color = background;
+            hitRecord rec2;
+            float tmax = std::numeric_limits<float>::infinity();
 
-            if (sph1.intersect(R, tmin, tmax)) {
+
+            if (sph1.intersect(R, tmin, tmax, rec2)) {
                 color = yellow;
             }
-            if (sph2.intersect(R, tmin, tmax)) {
+            if (sph2.intersect(R, tmin, tmax, rec2)) {
                 color = blue;
             }
-            if (sph3.intersect(R, tmin, tmax)) {
+            if (sph3.intersect(R, tmin, tmax, rec2)) {
                 color = yellow;
             }
             fb5.setPixelColor(i, j, color);
@@ -78,27 +91,28 @@ int main(int argc, char *argv[])
 
     Framebuffer fb6(200, 200);
     perspectiveCamera cam4(200, 200, vec3(0,0,0), vec3(0,0,-1), 1.0f, 0.5f, 0.5f);
-    triangle tri1(vec3(-1.2, -0.2, -7), vec3(0.8, -0.5, -5), vec3(0.9, 0, -5));
-    triangle tri2(vec3(0.773205, -0.93923, -7), vec3(0.0330127, 0.94282, -5), vec3(-0.45, 0.779423, -5));
-    triangle tri3(vec3(0.426795, 1.13923, -7), vec3(-0.833013, -0.44282, -5), vec3(-0.45, -0.779423, -5));
+    triangle tri1(vec3(-1.2, -0.2, -7), vec3(0.8, -0.5, -5), vec3(0.9, 0, -5), nullptr);
+    triangle tri2(vec3(0.773205, -0.93923, -7), vec3(0.0330127, 0.94282, -5), vec3(-0.45, 0.779423, -5), nullptr);
+    triangle tri3(vec3(0.426795, 1.13923, -7), vec3(-0.833013, -0.44282, -5), vec3(-0.45, -0.779423, -5), nullptr);
     for (int j = 0; j < 200; j++) {
         for (int i = 0; i < 200; i++) {
             ray R;
-            float tmin = 0.001f;
-            float tmax = std::numeric_limits<float>::infinity();
             cam4.generateRay(i, j, R);
             vec3 red(1.0f, 0.0f, 0.0f);
             vec3 green(0.0f, 1.0f, 0.0f);
             vec3 blue(0.0f, 0.0f, 1.0f);
             vec3 background(0.5f, 0.5f, 0.5f);
+            float tmax = std::numeric_limits<float>::infinity();
+
             vec3 color = background;
-            if (tri1.intersect(R, tmin, tmax)) {
+            hitRecord rec3;
+            if (tri1.intersect(R, tmin, tmax, rec3)) {
                 color = red;
             }
-            if (tri2.intersect(R, tmin, tmax)) {
+            if (tri2.intersect(R, tmin, tmax, rec3)) {
                 color = green;
             }
-            if (tri3.intersect(R, tmin, tmax)) {
+            if (tri3.intersect(R, tmin, tmax, rec3)) {
                 color = blue;
             }
             fb6.setPixelColor(i, j, color);
@@ -108,38 +122,62 @@ int main(int argc, char *argv[])
 
     Framebuffer fb7(200, 200);
     perspectiveCamera cam5(200, 200, vec3(0,0.2,3.5), vec3(0,0,-1), 1.0f, 0.5f, 0.5f);
-    sphere sph4(vec3(0, 0, -2), 1.0f);
+    sphere sph4(vec3(0, 0, -2), 1.0f, nullptr);
     //ears
-    triangle tri4(vec3(-1, 0, -2), vec3(0, 1, -2), vec3(-0.9, 1.5, -2));
-    triangle tri5(vec3(1, 0, -2), vec3(0, 1, -2), vec3(0.9, 1.5, -2));
+    triangle tri4(vec3(-1, 0, -2), vec3(0, 1, -2), vec3(-0.9, 1.5, -2), nullptr);
+    triangle tri5(vec3(1, 0, -2), vec3(0, 1, -2), vec3(0.9, 1.5, -2), nullptr);
     //eyes
-    triangle tri6(vec3(-0.6, 0.05, -1), vec3(-0.3, 0.05, -1), vec3(-0.45, 0.3, -1));
-    triangle tri7(vec3(0.6, 0.05, -1), vec3(0.3, 0.05, -1), vec3(0.45, 0.3, -1));
+    triangle tri6(vec3(-0.6, 0.05, -1), vec3(-0.3, 0.05, -1), vec3(-0.45, 0.3, -1), nullptr);
+    triangle tri7(vec3(0.6, 0.05, -1), vec3(0.3, 0.05, -1), vec3(0.45, 0.3, -1), nullptr);
     //nose
-    triangle tri8(vec3(0, 0.1, -1), vec3(-0.1, -0.1, -1), vec3(0.1, -0.1, -1));
+    triangle tri8(vec3(0, 0.1, -1), vec3(-0.1, -0.1, -1), vec3(0.1, -0.1, -1), nullptr);
     //mouth
-    triangle tri9(vec3(-0.25, -0.25, -1), vec3(0.25, -0.25, -1), vec3(0, -0.35, -1));
+    triangle tri9(vec3(-0.25, -0.25, -1), vec3(0.25, -0.25, -1), vec3(0, -0.35, -1), nullptr);
     for (int j = 0; j < 200; j++) {
         for (int i = 0; i < 200; i++) {
             ray R;
-            float tmin = 0.001f;
-            float tmax = std::numeric_limits<float>::infinity();
             cam5.generateRay(i, j, R);
             vec3 white = vec3(1.0, 1.0, 1.0);
             vec3 black = vec3(0, 0, 0);
             vec3 background = vec3(0.5, 0.2, 0.5f);
             vec3 color = background;
+            hitRecord rec4;
+            float tmax = std::numeric_limits<float>::infinity();
 
-            if (sph4.intersect(R, tmin, tmax) || tri4.intersect(R, tmin, tmax) || tri5.intersect(R, tmin, tmax)) {
+            if (sph4.intersect(R, tmin, tmax, rec4) || tri4.intersect(R, tmin, tmax, rec4) || tri5.intersect(R, tmin, tmax, rec4)) {
                 color = white;
             }
-            if (tri6.intersect(R, tmin, tmax) || tri7.intersect(R, tmin, tmax) || tri8.intersect(R, tmin, tmax) || tri9.intersect(R, tmin, tmax)) {
+            if (tri6.intersect(R, tmin, tmax, rec4) || tri7.intersect(R, tmin, tmax, rec4) || tri8.intersect(R, tmin, tmax, rec4) || tri9.intersect(R, tmin, tmax, rec4)) {
                 color = black;
             }
-            fb5.setPixelColor(i, j, color);
+            fb7.setPixelColor(i, j, color);
         }
     }
-    fb5.exportPNG("cat.png");
+    fb7.exportPNG("cat.png"); 
+
+    
+    Framebuffer fb8(200, 200);
+    perspectiveCamera cam6(200, 200, vec3(0, 0, 0), vec3(0,0,-1), 1.0f, 0.5f, 0.5f);
+    hittableList world;
+    auto mat1 = std::make_shared<lambertian>(vec3(0.7f, 0.3f, 0.3f));
+    world.add(std::make_shared<sphere>(vec3(0, 0, -3), 0.5f, mat1));
+    light light1(vec3(2, 2, 2), vec3(1.0f, 1.0f, 1.0f));
+    scene sc(&fb8, &cam6, &world, &light1, "output_lambertian.png");
+    sc.generateScene(vec3(0.5f, 0.5f, 0.5f));
+
+    Framebuffer fb9(200, 200);
+    perspectiveCamera cam7(200, 200, vec3(0, 0.5, 3.25), vec3(0,0,-1), 1.0f, 0.5f, 0.5f);
+    hittableList world2;
+    auto lambertMat = std::make_shared<lambertian>(vec3(0.7f, 0.3f, 0.3f));
+    auto bpMat = std::make_shared<blinnPhong>(vec3(0.3f, 0.3f, 0.7f), 0.5f, 0.5f);
+    auto normalMat = std::make_shared<normalShader>();
+    world2.add(std::make_shared<sphere>(vec3(0, 1, -3), 0.5f, lambertMat));
+    world2.add(std::make_shared<sphere>(vec3(1, 0, -3), 0.5f, bpMat));
+    world2.add(std::make_shared<sphere>(vec3(-1, 0, -3), 0.5f, normalMat));
+    light light2(vec3(2, 2, 2), vec3(1.0f, 1.0f, 1.0f));
+    scene sc2(&fb9, &cam7, &world2, &light2, "output_shaders.png");
+    sc2.generateScene(vec3(0.5f, 0.5f, 0.5f));
+
 
     return 0;
 }

@@ -10,6 +10,14 @@ add_library (cs4212-util
   shape.h
   sphere.h sphere.cpp
   triangle.h triangle.cpp
+  hittableList.h
+  hitRecord.h
+  shader.h
+  lambertianShader.h lambertianShader.cpp
+  normalShader.h normalShader.cpp
+  BPShader.h BPShader.cpp
+  scene.h
+  light.h
 )
 
 add_executable(fbMain

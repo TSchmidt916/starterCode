@@ -6,11 +6,19 @@ class camera {
     public:
     camera(int pixel_nx, int pixel_ny)  : pos(0, 0, 0), dir(0, 0, 0), focal_length(1.0f), 
     imageplane_width(0.5f), imageplane_height(0.5f), nx(pixel_nx), ny(pixel_ny) {
+        l = -imageplane_width / 2.0f;
+        r = imageplane_width / 2.0f;
+        b = -imageplane_height / 2.0f;
+        t = imageplane_height / 2.0f;
         normalizeDir();
     }
 
     camera(int pixel_nx, int pixel_ny, const vec3& position, const vec3& direction, float focalLen, float imgPlaneWidth, float imgPlaneHeight)
     : pos(position), dir(direction), focal_length(focalLen), imageplane_width(imgPlaneWidth), imageplane_height(imgPlaneHeight), nx(pixel_nx), ny(pixel_ny) {
+        l = -imageplane_width / 2.0f;
+        r = imageplane_width / 2.0f;
+        b = -imageplane_height / 2.0f;
+        t = imageplane_height / 2.0f;
         normalizeDir();
     }
 
@@ -26,10 +34,7 @@ class camera {
     int nx, ny;
     float imageplane_width;
     float imageplane_height;
-    float l = -imageplane_width / 2.0f;
-    float r = imageplane_width / 2.0f;
-    float b = -imageplane_height / 2.0f;
-    float t = imageplane_height / 2.0f;
+    float l, r, b, t;
 
     void normalizeDir() {
         W = unit_vector(-dir);

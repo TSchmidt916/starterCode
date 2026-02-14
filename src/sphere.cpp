@@ -1,6 +1,7 @@
 #include "sphere.h"
 
-bool sphere::intersect(const ray& r, const float tmin, float& tmax) const {
+
+bool sphere::intersect(const ray& r, const float tmin, float& tmax, hitRecord& rec) const {
     vec3 oc = center - r.origin();
     float a = dot(r.direction(), r.direction());
     float b = -2.0f * dot(r.direction(), oc);
@@ -18,6 +19,11 @@ bool sphere::intersect(const ray& r, const float tmin, float& tmax) const {
             }
         }
         tmax = root;
+        rec.t = root;
+        rec.p = r.at(rec.t);
+        vec3 outward_normal = (rec.p - center) / radius;
+        rec.set_face_normal(r, outward_normal);
+        rec.mat_ptr = mat_ptr;
         return true;
     }
 }

@@ -22,7 +22,7 @@ TEST_CASE( "sphere parameterized constructor" )
 {
     vec3 center(1.0f, 2.0f, 3.0f);
     float radius = 4.0f;
-    sphere s(center, radius);
+    sphere s(center, radius, nullptr);
     float eps = 1e-3;
 
     REQUIRE_THAT(s.center.x(), Catch::Matchers::WithinAbs(1.0f, eps));
@@ -36,15 +36,16 @@ TEST_CASE( "sphere intersection with ray hitting the sphere" )
 {
     vec3 center(0.0f, 0.0f, -5.0f);
     float radius = 1.0f;
-    sphere s(center, radius);
+    sphere s(center, radius, nullptr);
     float tmin = 0.001f;
     float tmax = std::numeric_limits<float>::infinity();
+    hitRecord rec;
 
     point3 origin(0.0f, 0.0f, 0.0f);
     vec3 direction(0.0f, 0.0f, -1.0f);
     ray r(origin, direction);
 
-    REQUIRE(s.intersect(r, tmin, tmax) == true);
+    REQUIRE(s.intersect(r, tmin, tmax, rec) == true);
 }
 
 //4
@@ -52,15 +53,16 @@ TEST_CASE( "sphere intersection with ray missing the sphere" )
 {
     vec3 center(0.0f, 0.0f, -5.0f);
     float radius = 1.0f;
-    sphere s(center, radius);
+    sphere s(center, radius, nullptr);
     float tmin = 0.001f;
     float tmax = std::numeric_limits<float>::infinity();
+    hitRecord rec;
 
     point3 origin(0.0f, 0.0f, 0.0f);
     vec3 direction(0.0f, 1.0f, 0.0f);
     ray r(origin, direction);
 
-    REQUIRE(s.intersect(r, tmin, tmax) == false);
+    REQUIRE(s.intersect(r, tmin, tmax, rec) == false);
 }
 
 //5
@@ -68,15 +70,16 @@ TEST_CASE( "sphere intersection with ray tangent to the sphere" )
 {
     vec3 center(0.0f, 1.0f, -5.0f);
     float radius = 1.0f;
-    sphere s(center, radius);
+    sphere s(center, radius, nullptr);
     float tmin = 0.001f;
     float tmax = std::numeric_limits<float>::infinity();
+    hitRecord rec;
 
     point3 origin(0.0f, 0.0f, 0.0f);
     vec3 direction(0.0f, 1.0f, -5.0f);
     ray r(origin, direction);
 
-    REQUIRE(s.intersect(r, tmin, tmax) == true);
+    REQUIRE(s.intersect(r, tmin, tmax, rec) == true);
 }
 
 //6
@@ -84,13 +87,14 @@ TEST_CASE( "sphere intersection with ray originating inside the sphere" )
 {
     vec3 center(0.0f, 0.0f, 0.0f);
     float radius = 2.0f;
-    sphere s(center, radius);
+    sphere s(center, radius, nullptr);
     float tmin = 0.001f;
     float tmax = std::numeric_limits<float>::infinity();
+    hitRecord rec;
 
     point3 origin(0.0f, 0.0f, 1.0f);
     vec3 direction(0.0f, 0.0f, 1.0f);
     ray r(origin, direction);
 
-    REQUIRE(s.intersect(r, tmin, tmax) == true);
+    REQUIRE(s.intersect(r, tmin, tmax, rec) == true);
 }
