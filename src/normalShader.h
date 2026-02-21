@@ -5,5 +5,5 @@ class normalShader : public shader {
 public:
     normalShader() : shader(vec3(1.0f, 1.0f, 1.0f)) {}
     
-    vec3 ray_color(const hitRecord& rec, const light& pointLight) const override;
+    vec3 ray_color(const hitRecord& rec, const light& pointLight, const hittableList& world, const vec3& backgroundColor, int depth) const override;
 };

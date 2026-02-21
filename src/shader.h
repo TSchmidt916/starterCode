@@ -2,6 +2,7 @@
 #include "ray.h"
 #include "light.h"
 #include "vec3.h"
+#include "hittableList.h"
 
 class hitRecord;
 
@@ -14,5 +15,9 @@ class shader {
 
     virtual ~shader() = default;
 
-    virtual vec3 ray_color(const hitRecord& rec, const light& pointLight) const = 0;
+    virtual vec3 ray_color(const hitRecord& rec, const light& pointLight, const hittableList& world, const vec3& backgroundColor, int depth) const = 0;
+
+    vec3 getBaseColor() const {
+        return base_color;
+    }
 };

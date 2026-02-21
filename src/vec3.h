@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include <iostream>
+#include <algorithm>
 
 class vec3 {
   public:
@@ -94,6 +95,14 @@ inline vec3 cross(const vec3& u, const vec3& v) {
 
 inline vec3 unit_vector(const vec3& v) {
     return v / v.length();
+}
+
+inline vec3 clamp(const vec3& v, float min, float max) {
+    return vec3(
+        std::clamp(v.e[0], min, max),
+        std::clamp(v.e[1], min, max),
+        std::clamp(v.e[2], min, max)
+    );
 }
 
 #endif

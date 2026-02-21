@@ -3,7 +3,7 @@
 #include "light.h"
 #include <algorithm>
 
-vec3 blinnPhong::ray_color(const hitRecord& rec, const light& pointLight) const {
+vec3 blinnPhong::ray_color(const hitRecord& rec, const light& pointLight, const hittableList& world, const vec3& backgroundColor, int depth) const {
     vec3 ambient = ka * base_color;
     
     vec3 light_dir = unit_vector(pointLight.position - rec.p);
@@ -11,12 +11,12 @@ vec3 blinnPhong::ray_color(const hitRecord& rec, const light& pointLight) const 
     float diff = std::max(0.0f, dot(rec.normal, light_dir));
     vec3 diffuse = kd * diff * base_color * pointLight.color;
     
-    vec3 view_dir = unit_vector(-rec.p);
+    vec3 view_dir = unit_vector(rec.incoming_ray.direction() - rec.p);
 
     vec3 halfway = unit_vector(light_dir + view_dir);
     
     float spec = std::pow(std::max(0.0f, dot(rec.normal, halfway)), shininess);
-    vec3 specular = ks * spec * pointLight.color;
+    vec3 specular = ks * spec * specular_color * pointLight.color;
     
-    return ambient + diffuse + specular;
+    return clamp(ambient + diffuse + specular, 0.0f, 1.0f);
 }

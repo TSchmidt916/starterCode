@@ -16,6 +16,7 @@ add_library (cs4212-util
   lambertianShader.h lambertianShader.cpp
   normalShader.h normalShader.cpp
   BPShader.h BPShader.cpp
+  mirrorShader.h mirrorShader.cpp
   scene.h
   light.h
 )
