@@ -16,6 +16,6 @@ vec3 mirrorShader::ray_color(const hitRecord& rec, const light& pointLight, cons
     if (world.intersect(reflected_ray, 0.001f, max_distance, reflected_rec)) {
         return reflected_rec.mat_ptr->ray_color(reflected_rec, pointLight, world, backgroundColor, depth - 1);
     } else {
-        return backgroundColor; // Background color
+        return backgroundColor;
     }
 }

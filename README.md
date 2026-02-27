@@ -126,3 +126,15 @@ Then, when you restart your terminals, you should be able to run the vcpkg progr
 vcpkg
 ```
 
+### To run fbMain.cpp
+build the project(should build automatically when opening) or cd into starterCode/buildVCPkg and run "cmake --build ."
+
+cd into starterCode\buildVCPkg\src\Debug
+
+run ./fbMain.exe with specified height, width, and output file name
+ex: ./fbMain.exe -h 200 -w 200 -o test.png
+
+this will output an image with a normal, Blinn Phong, Lambertian, and mirror sphere with shadows and a light source
+
+other examples are commented out in fbMain.cpp but the pngs they generate are all in buildVCPkg/src/Debug
+

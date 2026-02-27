@@ -10,13 +10,38 @@
 #include "hitRecord.h"
 #include "hittableList.h"
 #include "scene.h"
+#include "handleGraphicsArgs.h"
 #include <memory>
+
+using namespace sivelab;
 
 float tmin = 0.001f;
 float tmax = std::numeric_limits<float>::infinity();
 
 int main(int argc, char *argv[])
 {
+
+    GraphicsArgs args;
+    args.process(argc, argv);
+
+    Framebuffer fb(args.width, args.height);
+    perspectiveCamera cam(args.width, args.height, vec3(0,0,0), vec3(0,0,-1), 1.0f, 0.5f, 0.5f);
+    hittableList world;
+    auto lambertMat = std::make_shared<lambertian>(vec3(1.0f, 0.0f, 0.0f));
+    auto bpMat = std::make_shared<blinnPhong>(vec3(0.0f, 0.0f, 1.0f));
+    auto normalMat = std::make_shared<normalShader>();
+    auto mirrorMat = std::make_shared<mirrorShader>();
+    world.add(std::make_shared<sphere>(vec3(0, 1, -3), 0.5f, lambertMat));
+    world.add(std::make_shared<sphere>(vec3(1, 0, -3), 0.5f, bpMat));
+    world.add(std::make_shared<sphere>(vec3(-1, 0, -3), 0.5f, normalMat));  
+    world.add(std::make_shared<sphere>(vec3(0, -100.5, -3), 100.0f, std::make_shared<lambertian>(vec3(0.1f, 0.5f, 0.1f))));
+    world.add(std::make_shared<sphere>(vec3(1.5, 0, -3), 0.5f, std::make_shared<lambertian>(vec3(1.0f, 0.2f, 0.2f))));
+    world.add(std::make_shared<sphere>(vec3(0, 0, -3), 0.5f, mirrorMat));
+    light light(vec3(2, 2, 2), vec3(1.0f, 1.0f, 1.0f));
+    scene sc(&fb, &cam, &world, &light, args.outputFileName, vec3(0.5f, 0.5f, 0.5f));
+    sc.generateScene();
+
+    /*
     Framebuffer fb1;
     fb1.clearToColor(vec3(0.5, 0.0, 1.0));
     fb1.exportPNG("output.png");
@@ -166,8 +191,8 @@ int main(int argc, char *argv[])
     scene sc(&fb8, &cam6, &world, &light1, "output_lambertian.png", vec3(0.5f, 0.5f, 0.5f));
     sc.generateScene();
 
-    Framebuffer fb9(500, 500);
-    perspectiveCamera cam7(500, 500, vec3(0, 0.5, 3.25), vec3(0,0,-1), 1.0f, 0.5f, 0.5f);
+    Framebuffer fb9(200, 200);
+    perspectiveCamera cam7(200, 200, vec3(0, 0.5, 3.25), vec3(0,0,-1), 1.0f, 0.5f, 0.5f);
     hittableList world2;
     auto lambertMat = std::make_shared<lambertian>(vec3(1.0f, 0.0f, 0.0f));
     auto bpMat = std::make_shared<blinnPhong>(vec3(0.0f, 0.0f, 1.0f));
@@ -179,8 +204,8 @@ int main(int argc, char *argv[])
     scene sc2(&fb9, &cam7, &world2, &light2, "output_shaders.png", vec3(0.5f, 0.5f, 0.5f));
     sc2.generateScene();
 
-    Framebuffer fb10(500, 500);
-    perspectiveCamera cam8(500, 500, vec3(0, 0.0, 0.0), vec3(0,0,-1), 1.0f, 0.5f, 0.5f);
+    Framebuffer fb10(200, 200);
+    perspectiveCamera cam8(200, 200, vec3(0, 0.0, 0.0), vec3(0,0,-1), 1.0f, 0.5f, 0.5f);
     hittableList world3;
     auto bpMat2 = std::make_shared<blinnPhong>(vec3(0.3f, 0.3f, 1.0f));
     world3.add(std::make_shared<sphere>(vec3(0, 0, -3), 0.5f, bpMat2));
@@ -188,8 +213,8 @@ int main(int argc, char *argv[])
     scene sc3(&fb10, &cam8, &world3, &light3, "output_blinnPhong.png", vec3(0.5f, 0.5f, 0.5f));
     sc3.generateScene();
 
-    Framebuffer fb11(500, 500);
-    perspectiveCamera cam9(500, 500, vec3(0, 0.0, 0.0), vec3(0,0,-1), 1.0f, 0.5f, 0.5f);
+    Framebuffer fb11(200, 200);
+    perspectiveCamera cam9(200, 200, vec3(0, 0.0, 0.0), vec3(0,0,-1), 1.0f, 0.5f, 0.5f);
     hittableList world4;
     auto mirrorMat = std::make_shared<mirrorShader>();
     world4.add(std::make_shared<sphere>(vec3(0, 0, -3), 0.5f, mirrorMat));
@@ -199,4 +224,5 @@ int main(int argc, char *argv[])
     scene sc4(&fb11, &cam9, &world4, &light4, "output_mirror.png", vec3(0.5f, 0.5f, 0.5f));
     sc4.generateScene();
     return 0;
+    */
 }

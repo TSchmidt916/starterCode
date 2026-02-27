@@ -20,4 +20,8 @@ class shader {
     vec3 getBaseColor() const {
         return base_color;
     }
+
+    virtual bool shadow_ray(const hitRecord& rec, const light& pointLight, const hittableList& world) const {
+        return false;
+    }
 };
