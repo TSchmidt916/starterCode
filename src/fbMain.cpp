@@ -12,6 +12,9 @@
 #include "scene.h"
 #include "handleGraphicsArgs.h"
 #include <memory>
+#include "SceneContainer.h"
+#include "SceneLoader.h"
+#include "SceneParser_JSON.h"
 
 using namespace sivelab;
 
@@ -20,7 +23,110 @@ float tmax = std::numeric_limits<float>::infinity();
 
 int main(int argc, char *argv[])
 {
+    SceneContainer parsedScene;
 
+    std::shared_ptr<ISceneLoader> loader = std::make_shared<SceneLoader>(parsedScene);
+    SceneParser_JSON parser(loader);
+
+    std::string filename = argv[1];
+    std::string outputFile = (argc >= 3) ? argv[2] : "output.png";
+    parser.parseFileData(filename);
+
+
+    // ── 2. Camera ────────────────────────────────────────────────────────
+    auto cam = parsedScene.getCamera();
+    if (!cam) {
+        std::cerr << "ERROR: No camera in scene.\n";
+        return 1;
+    }
+
+    int imgW = 200, imgH = 200;
+    Framebuffer fb(imgW, imgH);
+
+    perspectiveCamera pcam(
+        imgW, imgH,
+        vec3(cam->position[0], cam->position[1], cam->position[2]),
+        vec3(cam->viewDir[0],  cam->viewDir[1],  cam->viewDir[2]),
+        cam->focalLength,
+        cam->imagePlaneWidth,
+        cam->imagePlaneWidth
+    );
+
+    // ── 3. Shapes ────────────────────────────────────────────────────────
+    hittableList world;
+
+    auto makeMatFromShader = [&](const std::shared_ptr<Shader>& s)
+        -> std::shared_ptr<shader>
+    {
+        if (!s) return std::make_shared<lambertian>(vec3(0.8f, 0.8f, 0.8f));
+
+        if (s->type == "Lambertian" || s->type == "Diffuse" || s->type == "CoolToWarm") {
+            return std::make_shared<lambertian>(
+                vec3(s->diffuse[0], s->diffuse[1], s->diffuse[2]));
+        }
+        else if (s->type == "BlinnPhong" || s->type == "Phong" ||
+                 s->type == "BlinnPhongMirrored") {
+            return std::make_shared<blinnPhong>(
+                vec3(s->diffuse[0], s->diffuse[1], s->diffuse[2]),
+                0.1f,
+                0.8f,
+                0.5f,
+                s->shininess,
+                vec3(s->specular[0], s->specular[1], s->specular[2])
+            );
+        }
+        else if (s->type == "Mirror") {
+            return std::make_shared<mirrorShader>();
+        }
+        else {
+            return std::make_shared<normalShader>();
+        }
+    };
+
+    for (auto& shapePtr : parsedScene.getShapes()) {
+        if (shapePtr->type == "sphere") {
+            auto s   = std::static_pointer_cast<Sphere>(shapePtr);
+            auto mat = makeMatFromShader(s->shader);
+            world.add(std::make_shared<sphere>(
+                vec3(s->center[0], s->center[1], s->center[2]),
+                s->radius, mat));
+        }
+        else if (shapePtr->type == "triangle") {
+            auto t   = std::static_pointer_cast<Triangle>(shapePtr);
+            auto mat = makeMatFromShader(t->shader);
+            world.add(std::make_shared<triangle>(
+                vec3(t->v0[0], t->v0[1], t->v0[2]),
+                vec3(t->v1[0], t->v1[1], t->v1[2]),
+                vec3(t->v2[0], t->v2[1], t->v2[2]),
+                mat));
+        }
+        else {
+            std::cerr << "Skipping unsupported shape type: " << shapePtr->type << "\n";
+        }
+    }
+
+    // ── 4. Lights ────────────────────────────────────────────────────────
+    vec3 lightPos(2, 2, 2);
+    vec3 lightColor(1, 1, 1);
+
+    if (!parsedScene.getLights().empty()) {
+        auto l = std::dynamic_pointer_cast<PointLight>(parsedScene.getLights()[0]);
+        if (l) {
+            lightPos   = vec3(l->position[0],  l->position[1],  l->position[2]);
+            lightColor = vec3(l->intensity[0], l->intensity[1], l->intensity[2]);
+        }
+    }
+
+    light sceneLight(lightPos, lightColor);
+
+    // ── 5. Render ────────────────────────────────────────────────────────
+    vec3 bgColor(0.5f, 0.5f, 0.5f);
+    scene sc(&fb, &pcam, &world, &sceneLight, outputFile, bgColor);  // FIX: sc not scene
+    sc.generateScene();
+
+    std::cout << "Rendered to: " << outputFile << "\n";
+
+    /*
     GraphicsArgs args;
     args.process(argc, argv);
 
@@ -41,7 +147,6 @@ int main(int argc, char *argv[])
     scene sc(&fb, &cam, &world, &light, args.outputFileName, vec3(0.5f, 0.5f, 0.5f));
     sc.generateScene();
 
-    /*
     Framebuffer fb1;
     fb1.clearToColor(vec3(0.5, 0.0, 1.0));
     fb1.exportPNG("output.png");

@@ -46,9 +46,6 @@ class scene {
                         if (list->intersect(R, tmin, tmax, rec)) {
                             rayColor = rec.mat_ptr->ray_color(rec, *l, *list, backgroundColor, 5);
                             bool shadow = rec.mat_ptr->shadow_ray(rec, *l, *list);
-                            if (shadow == true) {
-                                rayColor = vec3(0.0f, 0.0f, 0.0f);
-                            }
                         }
                         color += rayColor;
                     }

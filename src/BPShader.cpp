@@ -11,7 +11,7 @@ vec3 blinnPhong::ray_color(const hitRecord& rec, const light& pointLight, const 
     float diff = std::max(0.0f, dot(rec.normal, light_dir));
     vec3 diffuse = kd * diff * base_color * pointLight.color;
     
-    vec3 view_dir = unit_vector(rec.incoming_ray.direction() - rec.p);
+    vec3 view_dir = unit_vector(rec.incoming_ray.origin() - rec.p);
 
     vec3 halfway = unit_vector(light_dir + view_dir);
     

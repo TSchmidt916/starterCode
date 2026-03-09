@@ -19,11 +19,18 @@ add_library (cs4212-util
   mirrorShader.h mirrorShader.cpp
   scene.h
   light.h
+  SceneContainer.h 
+  SceneLoader.h
+  SceneParser_JSON.cpp SceneParser_JSON.h
 )
+
+find_package(nlohmann_json CONFIG REQUIRED)
 
 add_executable(fbMain
 fbMain.cpp
 )
+
+target_link_libraries(fbMain nlohmann_json::nlohmann_json)
 target_link_libraries(fbMain cs4212-util)
 target_link_libraries(fbMain ${Boost_PROGRAM_OPTIONS_LIBRARIES})
 target_link_libraries(fbMain PNG::PNG)
